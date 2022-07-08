@@ -1,0 +1,251 @@
+EKLEME 
+
+INSERT INTO tblogretmen (ogretmenAdi,ogretmenSoyadi,ogretmenTC,ogretmenTelNo,ogretmenAdres,bransID,Maas)VALUES ("Tolgahan","Şişman","22451785493","05324578912","Menderes mah. 47.sokak No:11 D:3 Esenler",1,7500)
+
+SİLME
+
+DELETE FROM tblogretmen WHERE ogretmenID=10
+
+GUNCELLEME
+
+UPDATE tblogretmen
+SET Maas=Maas+(Maas*0.1)
+WHERE Maas>=6000
+
+
+
+
+
+
+
+
+
+
+
+
+BASİT SORGULAR  /// Bir kaç branş daha ekleyip, branşlar için ortalama maaş bulunabilir.. ///
+
+1. Dershanede çalışan tüm öğretmenlerin ortalama maaşları
+
+SELECT AVG(Maas) FROM tblogretmen
+
+
+2. Dershanedeki her bir öğrenci için devamsızlık toplamlarını bulunuz.
+
+SELECT tbldevamsizlik.ogrenciID, tblogrenci.ogrenciTC, tblogrenci.ogrenciAdi, tblogrenci.ogrenciSoyadi , 
+SUM(devamsizlikSure) AS DEVAMSIZLIK 
+FROM tbldevamsizlik, tblogrenci 
+WHERE tblogrenci.ogrenciID=tbldevamsizlik.ogrenciID
+GROUP BY ogrenciID
+
+
+
+3. Devamsızlığı 5 ve üzeri olan öğrencileri listeleyiniz.
+
+
+SELECT tbldevamsizlik.ogrenciID, tblogrenci.ogrenciTC, tblogrenci.ogrenciAdi, tblogrenci.ogrenciSoyadi , 
+    SUM(devamsizlikSure) AS DEVAMSIZLIK 
+    FROM tbldevamsizlik, tblogrenci 
+    WHERE tblogrenci.ogrenciID=tbldevamsizlik.ogrenciID
+    GROUP BY ogrenciID HAVING DEVAMSIZLIK >= 5
+
+4. Dershanedeki tüm öğrencilerin sınıflarını ve velilerini gösteriniz.
+
+SELECT tblkategori.kategoriAdi,tblsube.subeAdi,tblogrenci.ogrenciTC,tblogrenci.ogrenciAdi, tblogrenci.ogrenciSoyadi,tblveli.veliTC,tblveli.veliAdi,tblveli.veliSoyadi 
+FROM tblogrenci,tblveli, tblkategori,tblsube,tblsinif
+WHERE tblogrenci.sinifID = tblsinif.sinifID 
+AND tblsinif.subeID = tblsube.subeID 
+AND tblsinif.kategoriID = tblkategori.kategoriID 
+AND tblogrenci.veliID = tblveli.veliID
+
+
+5. Her bir veli kaç adet veli toplantısına katılmış gösteriniz.
+
+SELECT o.ogrenciTC, o.ogrenciAdi,o.ogrenciSoyadi, v.veliTC,v.veliAdi,v.veliSoyadi ,COUNT(k.katilimID) AS TOPLANTIKATILIMSAYISI 
+FROM tblogrenci o,tblveli v,tblveli_toplanti 
+t,tblveli_toplanti_katilim k 
+WHERE o.veliID=v.veliID 
+AND v.veliID=k.veliID 
+AND k.toplantiID=t.toplantiID 
+GROUP BY o.ogrenciAdi
+
+
+
+6. Her bir öğretmenin adını, soyadını ve branşını getiriniz.
+
+SELECT tblogretmen.ogretmenAdi, tblogretmen.ogretmenSoyadi, tblbrans.bransAdi
+FROM tblogretmen,tblbrans
+WHERE tblogretmen.bransID=tblbrans.bransID 
+
+
+------------------------------------------------------------------------------------
+
+
+KARMAŞIK SORGULAR 
+
+
+1. Ortalamanın üzerinde maaş olan öğretmenleri listele
+
+SELECT tblogretmen.ogretmenAdi,tblogretmen.Maas
+FROM tblogretmen
+WHERE tblogretmen.Maas>(SELECT AVG(tblogretmen.Maas) 
+FROM tblogretmen) 
+
+
+
+
+2. Ödemesi yapılmamış öğrencileri listeleyiniz.
+
+SELECT tblogrenci.ogrenciID, tblogrenci.ogrenciTC,tblogrenci.ogrenciAdi,tblogrenci.ogrenciSoyadi
+FROM tblogrenci 
+WHERE tblogrenci.ogrenciID NOT IN 
+   (SELECT tblogrenci.ogrenciID 
+    FROM tblodeme,tblogrenci 
+    WHERE tblodeme.ogrenciID = tblogrenci.ogrenciID ) 
+    GROUP BY tblogrenci.ogrenciID
+
+
+3. Matematik branşındaki ortalama maaştan düşük veya eşit maaş olan öğretmenleri listeleyiniz.
+
+SELECT * FROM tblogretmen, tblbrans 
+WHERE tblogretmen.bransID=tblbrans.bransID 
+AND tblbrans.bransAdi="Matematik" 
+AND tblogretmen.Maas <= (
+    SELECT AVG(tblogretmen.Maas) AS ORTMAAS 
+    FROM tblogretmen, tblbrans
+    WHERE tblbrans.bransID=tblogretmen.bransID 
+    AND tblbrans.bransAdi="Matematik")
+
+
+4. Matematik branşındaki ortalama maaştan düşük alan matematik branşı öğretmenlerinin maaşına %10 zam yapınız.
+
+UPDATE tblogretmen
+SET Maas=Maas*1.1
+WHERE ogretmenID IN
+   (SELECT ogretmenID FROM tblogretmen, tblbrans
+    WHERE tblogretmen.bransID=tblbrans.bransID 
+    AND tblbrans.bransAdi="Matematik"
+	AND Maas<=
+         (SELECT AVG(Maas)
+         FROM tblogretmen
+         WHERE tblogretmen.bransID=tblbrans.bransID 
+         AND tblbrans.bransAdi="Matematik"))
+
+
+5. Öğretmenleri ve branşlarını join kullanarak gösteriniz. Maaşa göre küçükten büyüğe doğru sıralayınız.
+
+SELECT tblogretmen.ogretmenID, tblogretmen.ogretmenAdi, tblogretmen.ogretmenSoyadi, tblbrans.bransAdi, tblogretmen.Maas 
+FROM tblogretmen INNER JOIN tblbrans
+ON tblogretmen.bransID=tblbrans.bransID 
+ORDER BY tblogretmen.Maas ASC
+
+
+6. Öğretmenleri ve branşlarını gösteriniz. Branşı 'NULL' olan öğretmenler de dahil (LEFT JOIN).
+
+SELECT tblogretmen.ogretmenAdi, tblogretmen.ogretmenSoyadi, tblbrans.bransAdi
+FROM tblogretmen
+LEFT JOIN tblbrans
+ON tblogretmen.bransID=tblbrans.bransID
+
+
+7. Dershanede bazı branşlarda öğretmen yok. Öğretmeni olmayan branşları listeleyiniz.
+
+SELECT tblbrans.bransID, tblbrans.bransAdi FROM tblbrans WHERE tblbrans.bransID NOT IN  
+   (SELECT tblogretmen.bransID
+    FROM tblogretmen, tblbrans
+    WHERE tblogretmen.bransID=tblbrans.bransID
+    AND tblogretmen.bransID)
+
+
+8. Öğretmenleri ve branşlarını gösteriniz. Öğretmeni 'NULL' olan branşlar da dahil (RIGHT JOIN).
+
+SELECT tblogretmen.ogretmenAdi, tblogretmen.ogretmenSoyadi, tblbrans.bransAdi
+FROM tblogretmen
+RIGHT JOIN tblbrans
+ON tblogretmen.bransID=tblbrans.bransID
+
+
+
+
+TRIGGER 
+
+1. Bir öğretmen silindiğinde, öğretmenin vereceği dersleri de ders tablosundan silen bir trigger yazınız.
+
+CREATE TRIGGER kayit_silme AFTER DELETE ON tblogretmen
+	FOR EACH ROW DELETE tblders FROM tblders
+	WHERE tblders.ogretmenID=OLD.ogretmenID
+
+
+SQL => DELETE tblogretmen FROM tblogretmen WHERE tblogretmen.ogretmenID=3;
+
+
+
+
+PROSEDÜR
+
+1. TC ve MAAS değerlerini parametre olarak alarak, girilen TC numarasına ait öğretmenin maaş değerini güncelleyen bir prosedür yazınız.
+
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `maas_guncelleme`(IN `TC` VARCHAR(11), IN `MAAS` DOUBLE(15,2))
+    NO SQL
+UPDATE tblogretmen
+SET Maas = MAAS
+WHERE tblogretmen.ogretmenTC=TC$$
+DELIMITER ;
+
+
+2. Öğrenci TC'si, devamsızlık tarihi ve devamsızlık uzunluğunu alıp devamsızlık tablosuna ekleyen bir prosedür yazınız.
+
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `devamsizlik_ekle`(IN `TC` VARCHAR(11), IN `GUN` DATE, IN `SURE` DOUBLE(2,1))
+    NO SQL
+    DETERMINISTIC
+BEGIN
+DECLARE D INT(11);
+SET D = (SELECT ogrenciID FROM tblogrenci WHERE ogrenciTC=TC);
+INSERT INTO tbldevamsizlik (ogrenciID, devamsizlikTarih, devamsizlikSure) VALUES (D, GUN, SURE);
+END$$
+DELIMITER ;
+
+
+
+
+FONKSIYON
+
+1. Şu ana kadar dershaneye ödenen toplam parayı hesaplayan bir fonksiyon yazınız.
+
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` FUNCTION `kasada_bulunan_para`() RETURNS double(15,2) unsigned zerofill
+    NO SQL
+    DETERMINISTIC
+BEGIN
+DECLARE profit DOUBLE(15,2);
+SET profit = (SELECT SUM(odemeMiktar) FROM tblodeme);
+RETURN profit;
+END$$
+DELIMITER ;
+
+
+2. Öğretmenin TC değerini parametre olarak alıp en yakın tarihteki dersini getiren bir fonksiyon yazınız. 
+
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` FUNCTION `en_yakin_ders`(`TC` VARCHAR(11)) RETURNS date
+    NO SQL
+BEGIN
+DECLARE d DATE;
+  SET d = (SELECT d.dersTarih
+FROM tblogretmen o INNER JOIN tblders d ON o.ogretmenID=d.ogretmenID
+WHERE o.ogretmenTC=TC AND d.dersTarih >= NOW()
+ORDER BY d.dersTarih ASC
+LIMIT 1);
+  RETURN d;
+END$$
+DELIMITER ;
+
+
+
+--- SOR ---
+
+E-R 
+EKLEME-SİLME-GUNCELLEME 5 Mİ - 5'ER Mİ
+TRIGGER SQL - TİK

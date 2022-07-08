@@ -1,0 +1,53 @@
+Ödev İçeriği
+
+Merhaba arkadaşlar,
+
+Projede geçen dönem yaptığınız projeler üzerinden devam etmenizi ve bu projeleri geliştirmenizi istiyorum. Grubunuzdan herhangi birinin proje konusunu seçip o proje ile devam edebilirsiniz. Proje konusunu grup olarak 16 Mayıs tarihine kadar bana mail atmanız gerekiyor.
+
+
+
+Projede geçen dönem geliştirdiğiniz sisteme ek sorgular, tetikleyici, fonksiyon ve prosedür ekleyeceksiniz. Veritabanı en az 10 adet fiziksel tablo içerecek şekilde, yazılıma yeni özellikler eklenmelidir.
+
+
+
+Proje kapsamında: 
+
+
+
+1) Öncelikle bir sistem belirleyip, bu sistemin ihtiyaçlarını tanımlayınız. +
+
+
+
+2) Bu sistemin mantıksal veritabanı tasarımı yapıp, varlıklar, özellikleri, ilişkiler, kardinalite kısıtlarını içerecek varlık ilişki diyagramı ile bu tasarımı modelleyiniz. +
+
+
+
+3) Tüm fiziksel veritabanı tablolarını ve PK, FK, ve diğer bütünlük kriterlerini belirleyip fiziksel veritabanını oluşturunuz.  +
+
+
+
+4) Sistemin ihtiyaç duyacağı 
+
+ekleme, silme, güncelleme için en az 5 SQL cümleciği + 
+basit sorgular için en az 5 tane SQL sorgusu +
+karmaşık (aggregation içeren) sorgular için en az 5 tane SQL sorgusu +
+1 trigger +
+2 prosedür (saklı yordam) +
+2 fonksiyonu +
+
+
+soru-cevap şeklinde oluşturunuz. Bu sorgular geçen dönemki sorgulardan farklı olmalıdır.
+
+
+
+Proje çıktısı, yukarıdaki 4 ana bölümü içerecek proje raporu ve proje sunumu olacaktır. max. 4 sayfalık proje raporunu son teslim tarihinden önce tek pdf dosyası olarak BB’a yüklemeniz ve en fazla 15 dk.lık bir sunum ile projeyi bana sunmanız gerekmektedir.
+
+
+
+
+
+
+
+Deadline: 5 Haziran
+
+Sunum: 7-8 Haziran (Benimle maille iletisime gecip sunum saatinizi belirleyiniz)
